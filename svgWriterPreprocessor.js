@@ -188,7 +188,10 @@
                 pR,
                 pL,
                 newMid,
-                deltaX;
+                deltaX,
+                deltaX2,
+                deltaY,
+                deltaY2;
             if (omIn.type === "shape" || omIn.type === "text" ||
                 omIn.type === "group" || (omIn.type === "generic" && omIn.shapeBounds)) {
                 bnds = omIn.shapeBounds;
@@ -200,7 +203,7 @@
                         if (!nested) {
                             omIn.position.x = 0.0;
                             omIn.position.y = 1.0;
-                            omIn.position.unitEM = true;
+                            omIn.position.unitYEM = true;
                             if (omIn.children && omIn.children.length === 1) {
                                 omIn.children[0].position = omIn.children[0].position || {x: 0, y: 0};
                                 omIn.children[0].position.x = 0.0;
@@ -219,11 +222,25 @@
                             bnds.bottom += 1.0;
                         }
                     }
+                    if (omIn.shape === "circle" || omIn.shape === "ellipse" || omIn.shape === "rect") {
+                        if (omIn.boundsWithFX) {
+                            deltaX = (omIn.boundsWithFX.right - omIn.shapeBounds.right);
+                            deltaX2 = (omIn.shapeBounds.left - omIn.boundsWithFX.left);
+                            deltaY = -(omIn.boundsWithFX.top - omIn.shapeBounds.top);
+                            deltaY2 = omIn.boundsWithFX.bottom - omIn.shapeBounds.bottom;
+                            
+                            deltaX = -(deltaX + deltaX2) / 2.0;
+                            deltaY = -(deltaY + deltaY2) / 2.0;
+                            
+                            this.shiftBoundsX(bnds, deltaX);
+                            this.shiftBoundsY(bnds, deltaY);
+                        }
+                    }
                 }
                 
             } else if (omIn.type === "tspan") {
                 if (omIn.style) {
-                    if (isFinite(omIn.position.x)) {
+                    if (omIn.position && isFinite(omIn.position.x)) {
                         if (omIn.style["text-anchor"] === "middle") {
                             if(omIn._parentBounds) {
                                 pR = omIn._parentBounds.right;
