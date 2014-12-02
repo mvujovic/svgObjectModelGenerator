@@ -170,11 +170,108 @@
                 };
                 
                 self.addTextTransform(writer, svgNode, text, layer);
-                
+
+                // TODO(mvujovic): Trying this out.
+                self.addTextChunks2(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
+
                 return self.addTextChunks(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
             });
         };
-        
+
+        this._approximatelyEqual = function(a, b, tolerance) {
+            return Math.abs(a - b) < tolerance;
+        };
+
+        // Creates lines with character ranges based on vertical glyph
+        // positions.
+        this._createLines = function(glyphs) {
+            var lines = [],
+                isFirstLine = true,
+                previousY = 0,
+                currentLine;
+
+            for (var i = 0; i < glyphs.length; i++) {
+                var glyph = glyphs[i];
+                var y = glyph.transform.ty;
+
+                var yPositionChanged = !this._approximatelyEqual(previousY, y, 0.001);
+                if (isFirstLine || yPositionChanged) {
+                    // Finish the current line.
+                    if (currentLine) {
+                        currentLine.to = i;
+                    }
+
+                    // Start a new line.
+                    currentLine = {
+                        from: i,
+                        to: i,
+                        dy: y - previousY
+                    };
+                    lines.push(currentLine);
+
+                    isFirstLine = false;
+                }
+
+                previousY = y;
+            };
+
+            // Finish the last line because we won't see a y position change
+            // after the last character.
+            if (currentLine) {
+                currentLine.to = i;
+            }
+
+            return lines;
+        };
+
+        // Adds a segments array to each line. Each segement references a
+        // paragraph style and a text/span style.
+        this._addLineSegments = function(lines, paragraphs, spans) {
+            var from = 0;
+            var paragraphIndex = 0;
+            var spanIndex = 0;
+
+            lines.forEach(function(line) {
+                line.segments = [];
+                while (true) {
+                    var paragraph = paragraphs[paragraphIndex];
+                    var span = spans[spanIndex];
+
+                    var to = Math.min(line.to, paragraph.to, span.to);
+
+                    line.segments.push({
+                        from: from,
+                        to: to,
+                        paragraphStyle: paragraph.paragraphStyle,
+                        textStyle: span.textStyle
+                    });
+
+                    from = to;
+
+                    if (from == paragraph.to) {
+                        paragraphIndex++;
+                    }
+                    if (from == span.to) {
+                        spanIndex++;
+                    }
+                    if (from == line.to) {
+                        break;
+                    }
+                }
+            });
+        };
+
+        this.addTextChunks2 = function (svgNode, layer, text, writer, position, bounds, dpi) {
+            var glyphs = text.glyphs,
+                paragraphs = text.paragraphStyleRange,
+                spans = text.textStyleRange;
+
+            var lines = this._createLines(glyphs);
+            this._addLineSegments(lines, paragraphs, spans);
+
+            console.log(lines);
+        }
+
         this.addTextChunks = function (svgNode, layer, text, writer, position, bounds, dpi) {
             var textString = text.textKey,
                 svgParagraphNode,
