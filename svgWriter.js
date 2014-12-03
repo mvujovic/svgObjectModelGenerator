@@ -272,23 +272,16 @@
                 }
                 
                 if (omIn.position) {
-                    var lineEM = 1.2,
-                        fontSize = omIn.style["font-size"],
-                        leading = omIn.style["_leading"];
-                    if (leading && fontSize && leading.units === fontSize.units) {
-                        lineEM = util.round1k(leading.value / fontSize.value);
-                    }
-                    
                     if (!ctx._nextTspanAdjustSuper) {
+                        var fontSize = omIn.style["font-size"];
+
                         if (omIn.position.unitY === "em") {
                             writeAttrIfNecessary(ctx, "dy", omIn.position.y + "em", "0em", "");
+                        } else if (fontSize && fontSize.value > 0) {
+                            var ems = util.round1k(omIn.position.y / fontSize.value);
+                            writeAttrIfNecessary(ctx, "dy", ems + "em", "0em", "");
                         } else {
-                            if (fontSize && fontSize.value > 0) {
-                                var ems = util.round1k(omIn.position.y / fontSize.value);
-                                writeAttrIfNecessary(ctx, "dy", ems + "em", "0em", "");
-                            } else {
-                                writeAttrIfNecessary(ctx, "dy", omIn.position.y, "0", "");
-                            }
+                            writeAttrIfNecessary(ctx, "dy", omIn.position.y, "0", "");
                         }
                     }
                     
