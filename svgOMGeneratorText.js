@@ -159,12 +159,16 @@
                 
                 svgNode.textBounds = JSON.parse(JSON.stringify(layer.bounds));
                 
+                // If the text is at the origin, we won't get a textClickPoint.
+                var x = (text.textClickPoint && text.textClickPoint.horizontal) ? text.textClickPoint.horizontal.value : 0;
+                var y = (text.textClickPoint && text.textClickPoint.vertical) ? text.textClickPoint.vertical.value : 0;
+
                 // It seems that textClickPoint is a quite reliable global position for
                 // the initial <text> element. 
                 // Values in percentage, moving to pixels so it is easier to work with te position
                 svgNode.position = {
-                    x: omgUtils.pct2px(text.textClickPoint.horizontal.value, writer._root.docBounds.right - writer._root.docBounds.left),
-                    y: omgUtils.pct2px(text.textClickPoint.vertical.value, writer._root.docBounds.bottom - writer._root.docBounds.top),
+                    x: omgUtils.pct2px(x, writer._root.docBounds.right - writer._root.docBounds.left),
+                    y: omgUtils.pct2px(y, writer._root.docBounds.bottom - writer._root.docBounds.top),
                     unitX: "px",
                     unitY: "px"
                 };
@@ -261,6 +265,7 @@
                         from: from,
                         to: to,
                         textContent: textString.substring(from, to).replace("\r",""),
+                        // TODO(mvujovic): Change this to local coordinates.
                         x: glyphs[from].transform.tx,
                         paragraphStyle: paragraph.paragraphStyle,
                         span: span
