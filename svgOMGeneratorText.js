@@ -172,9 +172,8 @@
                 self.addTextTransform(writer, svgNode, text, layer);
 
                 // TODO(mvujovic): Trying this out.
-                self.addTextChunks2(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
-
-                return self.addTextChunks(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
+                return self.addTextChunks2(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
+                // return self.addTextChunks(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
             });
         };
 
@@ -264,7 +263,7 @@
                         textContent: textString.substring(from, to).replace("\r",""),
                         x: glyphs[from].transform.tx,
                         paragraphStyle: paragraph.paragraphStyle,
-                        textStyle: span.textStyle
+                        span: span
                     });
 
                     from = to;
@@ -282,6 +281,56 @@
             });
         };
 
+        this._writeSVGOMWithLines = function(lines, svgNode, layer, writer, dpi) {
+            writer.pushCurrent(svgNode);
+
+            lines.forEach(function(line, lineIndex) {
+                var svgLineNode,
+                    segments = line.segments,
+                    lineId = svgNode.id + "-" + lineIndex,
+                    lineHasMultipleSegments = (segments.length > 1);
+
+                if (lineHasMultipleSegments) {
+                    svgLineNode = writer.addSVGNode(lineId, "tspan", true);
+                    svgLineNode.position = {
+                        x: 0,
+                        y: _boundInPx(line.dy, dpi)
+                    };
+                    writer.pushCurrent(svgLineNode);
+                }
+
+                segments.forEach(function(segment, segmentIndex) {
+                    var segmentId = lineId;
+                    if (lineHasMultipleSegments) {
+                        segmentId += "-" + segmentIndex;
+                    }
+
+                    var svgSegmentNode = writer.addSVGNode(segmentId, "tspan", true);
+                    svgSegmentNode.text = segment.textContent;
+                    svgSegmentNode.position = {
+                        x: _boundInPx(segment.x, dpi),
+                        y: lineHasMultipleSegments ? 0 : _boundInPx(line.dy, dpi),
+                        unitX: "px",
+                        unitY: "px"
+                    };
+
+                    omgStyles.addParagraphStyle(svgSegmentNode, segment.paragraphStyle);
+                    omgStyles.addTextChunkStyle(svgSegmentNode, segment.span);
+                });
+
+                if (lineHasMultipleSegments) {
+                    // Pop svgLineNode.
+                    writer.popCurrent();
+                }
+            });
+
+            omgStyles.addTextStyle(svgNode, layer);
+            omgStyles.addStylingData(svgNode, layer, dpi);
+
+            // Pop svgNode.
+            writer.popCurrent();
+        };
+
         this.addTextChunks2 = function (svgNode, layer, text, writer, position, bounds, dpi) {
             var textString = text.textKey,
                 paragraphs = text.paragraphStyleRange,
@@ -292,11 +341,15 @@
             this._ensureUniqueRanges(paragraphs);
             this._ensureUniqueRanges(spans);
 
-            // Fold our input into lines.
+            // Create lines with styled segments out of our input.
             var lines = this._createLines(glyphs);
             this._addLineSegments(lines, textString, paragraphs, spans, glyphs);
-
             console.log(JSON.stringify(lines, null, 2));
+
+            // Turn the lines into an SVG OM.
+            this._writeSVGOMWithLines(lines, svgNode, layer, writer, dpi);
+
+            return true;
         }
 
         this.addTextChunks = function (svgNode, layer, text, writer, position, bounds, dpi) {
