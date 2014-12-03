@@ -224,9 +224,28 @@
             return lines;
         };
 
+        // There seems to be a PS bug in which we get 2 identical
+        // textStyleRanges next to each other with a test case like:
+        // "0<hard wrap>123<soft wrap>4 56",
+        // where the "5" has a different text color.
+        this._ensureUniqueRanges = function(ranges) {
+            var seenRanges = {};
+            var indicesToDelete = [];
+            ranges.forEach(function(range, rangeIndex) {
+                var rangeKey = range.from + ' to ' + range.to;
+                if (seenRanges[rangeKey]) {
+                    indicesToDelete.push(rangeIndex);
+                }
+                seenRanges[rangeKey] = true;
+            });
+            indicesToDelete.forEach(function(indexToDelete) {
+                ranges.splice(indexToDelete, 1);
+            });
+        };
+
         // Adds a segments array to each line. Each segement references a
         // paragraph style and a text/span style.
-        this._addLineSegments = function(lines, paragraphs, spans) {
+        this._addLineSegments = function(lines, textString, paragraphs, spans, glyphs) {
             var from = 0;
             var paragraphIndex = 0;
             var spanIndex = 0;
@@ -242,6 +261,8 @@
                     line.segments.push({
                         from: from,
                         to: to,
+                        textContent: textString.substring(from, to).replace("\r",""),
+                        x: glyphs[from].transform.tx,
                         paragraphStyle: paragraph.paragraphStyle,
                         textStyle: span.textStyle
                     });
@@ -262,14 +283,20 @@
         };
 
         this.addTextChunks2 = function (svgNode, layer, text, writer, position, bounds, dpi) {
-            var glyphs = text.glyphs,
+            var textString = text.textKey,
                 paragraphs = text.paragraphStyleRange,
-                spans = text.textStyleRange;
+                spans = text.textStyleRange,
+                glyphs = text.glyphs;
 
+            // Sanitize our input a little bit.
+            this._ensureUniqueRanges(paragraphs);
+            this._ensureUniqueRanges(spans);
+
+            // Fold our input into lines.
             var lines = this._createLines(glyphs);
-            this._addLineSegments(lines, paragraphs, spans);
+            this._addLineSegments(lines, textString, paragraphs, spans, glyphs);
 
-            console.log(lines);
+            console.log(JSON.stringify(lines, null, 2));
         }
 
         this.addTextChunks = function (svgNode, layer, text, writer, position, bounds, dpi) {

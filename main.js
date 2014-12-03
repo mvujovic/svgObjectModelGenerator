@@ -148,6 +148,7 @@
                         origMode = JSON.parse(origMode);
                     }
                     generator.getDocumentInfo(docId, docInfoFlags).then(function (doc) {
+                        console.log(JSON.stringify(doc, null, 4));
                         cacheInfo._lastDocInfoPromise = undefined;
                         cacheInfo._lastDocInfo = doc;
                         docInfoDeferred.resolve(doc);
