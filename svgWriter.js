@@ -278,10 +278,11 @@
                         if (omIn.position.unitY === "em") {
                             writeAttrIfNecessary(ctx, "dy", omIn.position.y + "em", "0em", "");
                         } else if (fontSize && fontSize.value > 0) {
-                            var ems = util.round1k(omIn.position.y / fontSize.value);
-                            writeAttrIfNecessary(ctx, "dy", ems + "em", "0em", "");
+                            var em = util.round1k(omIn.position.y / fontSize.value);
+                            writeAttrIfNecessary(ctx, "dy", em + "em", "0em", "");
                         } else {
-                            writeAttrIfNecessary(ctx, "dy", omIn.position.y, "0", "");
+                            var px = util.round1k(omIn.position.y);
+                            writeAttrIfNecessary(ctx, "dy", px, "0", "");
                         }
                     }
                     
