@@ -300,7 +300,7 @@
 
                     svgLineNode.text = segment.textContent;
                     svgLineNode.position = {
-                        x: segment.x - bounds.left,
+                        x: segment.x,
                         y: line.y - bounds.top,
                         unitX: "px",
                         unitY: "px"
@@ -323,7 +323,7 @@
                     var svgSegmentNode = writer.addSVGNode(segmentId, "tspan", true);
                     svgSegmentNode.text = segment.textContent;
                     svgSegmentNode.position = {
-                        x: segment.x - bounds.left,
+                        x: segment.x,
                         unitX: "px",
                     };
 
