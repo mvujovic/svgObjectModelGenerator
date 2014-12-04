@@ -381,7 +381,7 @@
             }
             
             paragraphNode.style = {
-                "text-anchor": fetchTextAlign(paragraphStyle),
+                // "text-anchor": fetchTextAlign(paragraphStyle),
                 "font-size": _computeMaxFontSize(paragraphNode)
             }
         }

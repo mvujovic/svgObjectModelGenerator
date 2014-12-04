@@ -286,7 +286,7 @@
             });
         };
 
-        this._writeSVGOMWithLines = function(lines, svgNode, layer, writer, dpi) {
+        this._writeSVGOMWithLines = function(lines, svgNode, layer, writer, bounds, dpi) {
             writer.pushCurrent(svgNode);
 
             lines.forEach(function(line, lineIndex) {
@@ -298,8 +298,10 @@
                 if (lineHasMultipleSegments) {
                     svgLineNode = writer.addSVGNode(lineId, "tspan", true);
                     svgLineNode.position = {
-                        x: 0,
-                        y: _boundInPx(line.dy, dpi)
+                        x:  -bounds.left,
+                        y: _boundInPx(line.dy, dpi) - bounds.top,
+                        unitX: "px",
+                        unitY: "px"
                     };
                     writer.pushCurrent(svgLineNode);
                 }
@@ -313,8 +315,8 @@
                     var svgSegmentNode = writer.addSVGNode(segmentId, "tspan", true);
                     svgSegmentNode.text = segment.textContent;
                     svgSegmentNode.position = {
-                        x: _boundInPx(segment.x, dpi),
-                        y: lineHasMultipleSegments ? 0 : _boundInPx(line.dy, dpi),
+                        x: _boundInPx(segment.x, dpi) - bounds.left,
+                        y: (lineHasMultipleSegments ? 0 : _boundInPx(line.dy, dpi)) - bounds.top,
                         unitX: "px",
                         unitY: "px"
                     };
@@ -352,7 +354,7 @@
             console.log(JSON.stringify(lines, null, 2));
 
             // Turn the lines into an SVG OM.
-            this._writeSVGOMWithLines(lines, svgNode, layer, writer, dpi);
+            this._writeSVGOMWithLines(lines, svgNode, layer, writer, bounds, dpi);
 
             return true;
         }

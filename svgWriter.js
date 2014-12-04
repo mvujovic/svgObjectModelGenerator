@@ -355,25 +355,25 @@
                         pxWidth = omIn.textBounds.right - omIn.textBounds.left,
                         pxHeight = omIn.textBounds.bottom - omIn.textBounds.top;
                     
-                    if (children && children.length > 0 &&
-                        children[0].style && children[0].style["text-anchor"] === "end") {
-                        rightAligned = true;
-                    } else if (children && children.length > 0 &&
-                        children[0].style && children[0].style["text-anchor"] === "middle") {
-                        centered = true;
-                    }
+                    // if (children && children.length > 0 &&
+                    //     children[0].style && children[0].style["text-anchor"] === "end") {
+                    //     rightAligned = true;
+                    // } else if (children && children.length > 0 &&
+                    //     children[0].style && children[0].style["text-anchor"] === "middle") {
+                    //     centered = true;
+                    // }
                     
                     write(ctx, ctx.currentIndent + "<text");
 
                     writeClassIfNeccessary(ctx);
                     
-                    if (rightAligned) {
-                        writeAttrIfNecessary(ctx, "x", "100%", 0, "%");
-                        omIn.position.x = 0;
-                        writePositionIfNecessary(ctx, omIn.position);
-                    } else {
-                        writePositionIfNecessary(ctx, omIn.position);
-                    }
+                    // if (rightAligned) {
+                    //     writeAttrIfNecessary(ctx, "x", "100%", 0, "%");
+                    //     omIn.position.x = 0;
+                    //     writePositionIfNecessary(ctx, omIn.position);
+                    // } else {
+                    //     writePositionIfNecessary(ctx, omIn.position);
+                    // }
                     
                     if (centered && omIn.transform) {
                         omIn.transformTX += pxWidth;
