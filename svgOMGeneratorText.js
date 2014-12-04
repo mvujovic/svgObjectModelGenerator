@@ -175,9 +175,7 @@
                 
                 self.addTextTransform(writer, svgNode, text, layer);
 
-                // TODO(mvujovic): Trying this out.
-                return self.addTextChunks2(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
-                // return self.addTextChunks(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
+                return self.addTextChunks(svgNode, layer, text, writer, svgNode.position, svgNode.shapeBounds, dpi);
             });
         };
 
@@ -347,7 +345,7 @@
             writer.popCurrent();
         };
 
-        this.addTextChunks2 = function (svgNode, layer, text, writer, position, bounds, dpi) {
+        this.addTextChunks = function (svgNode, layer, text, writer, position, bounds, dpi) {
             var textString = text.textKey,
                 paragraphs = text.paragraphStyleRange,
                 spans = text.textStyleRange,
@@ -367,113 +365,6 @@
 
             return true;
         }
-
-        this.addTextChunks = function (svgNode, layer, text, writer, position, bounds, dpi) {
-            var textString = text.textKey,
-                svgParagraphNode,
-                svgTextChunkNode,
-                yEMs = 0;
-            
-            writer.pushCurrent(svgNode);
-            
-            // A paragraph is a newline added by the user. Each paragraph can
-            // have a different text alignment.
-            text.paragraphStyleRange.forEach(function (paragraph, iP) {
-                var from,
-                    to,
-                    i,
-                    indexTextStyleFrom,
-                    indexTextStyleTo,
-                    textSR = text.textStyleRange,
-                    paragraphId = svgNode.id + "-" + iP,
-                    spanId,
-                    yPosGuess = (iP / text.paragraphStyleRange.length),
-                    pctYPosGuess = Math.round(100.0 * yPosGuess),
-                    svgParagraphNode,
-                    currentFrom = paragraph.from,
-                    xPosGuess,
-                    textContent;
-                
-                // Text can consist of multiple textStyles. A textStyle
-                // may span over multiple paragraphs and describes the text color
-                // and font styling of each text span.
-                textSR.forEach(function (textStyle, index) {
-                    if (textStyle.from <= paragraph.from &&
-                        (!isFinite(indexTextStyleFrom) || textSR[indexTextStyleFrom].from < textStyle.from)) {
-                        indexTextStyleFrom = index;
-                    }
-                    if (textStyle.to >= paragraph.to &&
-                        (!isFinite(indexTextStyleTo) || textSR[indexTextStyleTo].to > textStyle.to)) {
-                        indexTextStyleTo = index;
-                    }
-                });
-                
-                if(!isFinite(indexTextStyleFrom) || !isFinite(indexTextStyleTo)) {
-                    console.log('ERROR: Text style range no found for paragraph.');
-                    return false;
-                }
-                
-                if (indexTextStyleFrom !== indexTextStyleTo) {
-                    
-                    //then nest a paragraphNode...
-                    svgParagraphNode = writer.addSVGNode(svgNode.id + "-" + i, "tspan", true);
-                    svgParagraphNode.position = {
-                        x: position.x,
-                        y: position.y,
-                        unitX: position.unitX,
-                        unitY: position.unitY
-                    };
-                    svgParagraphNode.textBounds = JSON.parse(JSON.stringify(bounds));
-                    writer.pushCurrent(svgParagraphNode);
-                    pctYPosGuess = 0;
-                }
-                
-                //process each text style, start at paragraph.from and end at paragraph.to
-                //fill in any necessary text style in-between
-                for (i = indexTextStyleFrom; i <= indexTextStyleTo; i++) {
-                    from = (i === indexTextStyleFrom) ? paragraph.from : textSR[i].from;
-                    to = (i === indexTextStyleTo) ? paragraph.to : textSR[i].to;
-                    
-                    textContent = textString.substring(from, to).replace("\r","");
-                    if (!textContent) {
-                        //represents a blank line, needs to translate to y-positioning
-                        yEMs++;
-                        continue;
-                    }
-                    spanId = (indexTextStyleTo === indexTextStyleFrom) ? paragraphId : paragraphId + "-" + (i - indexTextStyleFrom);
-                    svgTextChunkNode = writer.addSVGNode(spanId, "tspan", true);
-                    svgTextChunkNode.text = textContent;
-                    
-                    svgTextChunkNode.textBounds = JSON.parse(JSON.stringify(bounds));
-                    
-                    //TBD: guess X based on the position assuming characters are same width (bad assumption, but it is what we have to work with)
-                    xPosGuess = currentFrom / (paragraph.to - paragraph.from);
-                    
-                    if (indexTextStyleFrom === indexTextStyleTo) {
-                        svgTextChunkNode.position = {
-                            x: _boundInPx(position.x, dpi),
-                            y: yEMs,
-                            unitX: "px",
-                            unitY: "em"
-                        };
-                        omgStyles.addParagraphStyle(svgTextChunkNode, paragraph.paragraphStyle);
-                    }
-                    yEMs = 1;
-                    omgStyles.addTextChunkStyle(svgTextChunkNode, textSR[i]);
-                }
-                
-                if (indexTextStyleFrom !== indexTextStyleTo) {
-                    omgStyles.addParagraphStyle(svgParagraphNode, paragraph.paragraphStyle);
-                    writer.popCurrent();
-                }
-            });
-            
-            omgStyles.addTextStyle(svgNode, layer);
-            omgStyles.addStylingData(svgNode, layer, dpi);
-            
-            writer.popCurrent();
-            return true;
-        };
 
         this.addTextTransform = function (writer, svgNode, text, layer) {
             if (!text.transform && (!text.textShape || text.textShape.length === 0 || !text.textShape[0].transform)) {
