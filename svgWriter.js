@@ -265,12 +265,8 @@
                 break;
             case "tspan": {
                 write(ctx, "<tspan");
-                // Set paragraph styles.
                 
-                // if (ctx._nextTspanAdjustSuper) {
-                //     writeAttrIfNecessary(ctx, "dy", "0.6em", "0em", "");
-                // }
-                
+                // Output coordinates if specified, including zero coordinates.
                 if (omIn.position) {
                     if (omIn.position.x != null) {
                         var x = util.round1k(omIn.position.x);
@@ -281,37 +277,8 @@
                         var y = util.round1k(omIn.position.y);
                         writeAttrIfNecessary(ctx, "y", y, "", "");
                     }
-                    
-                    // if (!omIn.style ||
-                    //     (omIn.style["text-anchor"] !== "middle" &&
-                    //      omIn.style["text-anchor"] !== "end") &&
-                    //     isFinite(omIn.position.x)) {
-                        
-                    //     if (sibling) {
-                    //         writePositionIfNecessary(ctx, {
-                    //             x: omIn.position.x,
-                    //             unitX: omIn.position.unitX
-                    //         }, "");
-                    //     }
-                    // } else if (omIn.style["text-anchor"] === "middle") {
-                    //     writePositionIfNecessary(ctx, {
-                    //         x: omIn.position.x,
-                    //         unitX: omIn.position.unitX
-                    //     });
-                    //     if (isFinite(omIn.position.deltaX)) {
-                    //         writeAttrIfNecessary(ctx, "dx", omIn.position.deltaX, "0", "px");
-                    //     }
-                    // } else if (omIn.style["text-anchor"] === "end") {
-                    //     writeAttrIfNecessary(ctx, "x", "100%", "0%", "");
-                    //     writeAttrIfNecessary(ctx, "startOffset", "100%", "0%", "");
-                    //     if (isFinite(omIn.position.deltaX)) {
-                    //         writeAttrIfNecessary(ctx, "dx", omIn.position.deltaX, "0", "px");
-                    //     }
-                    // }
                 }
-                
-                // ctx._nextTspanAdjustSuper = false;
-                
+                                
                 writeClassIfNeccessary(ctx);
                 write(ctx, ">");
 
@@ -326,19 +293,13 @@
                     write(ctx, encodedText(omIn.text));
                 }
                 write(ctx, "</tspan>");
-                
-                // if (omIn.style && omIn.style["_baseline-script"] === "super") {
-                //     ctx._nextTspanAdjustSuper = true;
-                // }
-                
+                                
                 break;
             }
             case "text":
                 gWrap(ctx, omIn.id, function () {
                     
                     var children = ctx.currentOMNode.children,
-                        rightAligned = false,
-                        centered = false,
                         i,
                         bndsFx,
                         bndsNat,
@@ -348,35 +309,13 @@
                         pxWidth = omIn.textBounds.right - omIn.textBounds.left,
                         pxHeight = omIn.textBounds.bottom - omIn.textBounds.top;
                     
-                    // if (children && children.length > 0 &&
-                    //     children[0].style && children[0].style["text-anchor"] === "end") {
-                    //     rightAligned = true;
-                    // } else if (children && children.length > 0 &&
-                    //     children[0].style && children[0].style["text-anchor"] === "middle") {
-                    //     centered = true;
-                    // }
-                    
                     write(ctx, ctx.currentIndent + "<text");
 
                     writeClassIfNeccessary(ctx);
-                    
-                    // if (rightAligned) {
-                    //     writeAttrIfNecessary(ctx, "x", "100%", 0, "%");
-                    //     omIn.position.x = 0;
-                    //     writePositionIfNecessary(ctx, omIn.position);
-                    // } else {
-                    //     writePositionIfNecessary(ctx, omIn.position);
-                    // }
-                    
-                    if (centered && omIn.transform) {
-                        omIn.transformTX += pxWidth;
-                        omIn.transformTY += pxHeight;
-                    }
-                    
+
                     writeTransformIfNecessary(ctx, "transform", omIn.transform, omIn.transformTX, omIn.transformTY);
                     write(ctx, ">");
 
-                    ctx._nextTspanAdjustSuper = false;
                     ctx.omStylesheet.writePredefines(ctx);
                     
                     for (i = 0; i < children.length; i++) {

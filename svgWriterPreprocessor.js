@@ -234,65 +234,14 @@
                 }
                 
             } else if (omIn.type === "tspan") {
-                // if (omIn.style) {
-                //     if (omIn.position && isFinite(omIn.position.x)) {
-                //         if (omIn.style["text-anchor"] === "middle") {
-                //             if(omIn._parentBounds) {
-                //                 pR = omIn._parentBounds.right;
-                //                 pL = omIn._parentBounds.left;
-                //                 newMid = omIn._parentBounds.left + (pR - pL) / 2.0;
-                //                 if (omIn._parentIsRoot) {
-                //                     omIn.position.x = 50;
-                //                     omIn.position.unitX = "%";
-                //                 } else {
-                //                     omIn.position.x = newMid;
-                //                     omIn.position.unitX = "px";
-                //                 }
-                //             } else {
-                //                 omIn.position.x = 50;
-                //                 omIn.position.unitX = "%";
-                //             }
-                            
-                //         } else if (omIn.style["text-anchor"] === "end") {
-                            
-                //             pR = omIn._parentBounds.right;
-                //             pL = omIn._parentBounds.left;
-                //             newMid = omIn._parentBounds.left + (pR - pL) / 2.0;
-                            
-                //             if (omIn._parentIsRoot || !omIn.textBounds) {
-                //                 omIn.position.x = 100;
-                //             } else {
-                //                 deltaX = (ctx.contentBounds.right - omIn.textBounds.right);
-                //                 omIn.position.deltaX = -deltaX;
-                //             }
-                //         } else {
-                //             if (sibling && !omIn._hasParentTXFM) {
-                //                 omIn.position.x += ctx._shiftContentX;
-                //             } else {
-                //                 if (omIn._parentIsRoot) {
-                //                     omIn.position.x = 0;
-                //                 } else {
-                //                     omIn.position.x = undefined;
-                //                 }
-                //             }
-                //         }
-                //     }
-                    
-                //     if (omIn.style["_baseline-script"] === "sub" ||
-                //         omIn.style["_baseline-script"] === "super") {
-                //         if (typeof omIn.style["font-size"] === "number") {
-                //             omIn.style["font-size"] = Math.round(omIn.style["font-size"] / 2.0);
-                //         } else {
-                //             omIn.style["font-size"].value = Math.round(omIn.style["font-size"].value / 2.0);
-                //         }
-                //     }
-                    
-                //     if (omIn.style["_baseline-script"] === "super") {
-                //         omIn.position = omIn.position || {};
-                //         omIn.position.y = -0.5;
-                //         omIn.position.unitY = "em";
-                //     }
-                // }
+                if (omIn.style["_baseline-script"] === "sub" ||
+                    omIn.style["_baseline-script"] === "super") {
+                    if (typeof omIn.style["font-size"] === "number") {
+                        omIn.style["font-size"] = Math.round(omIn.style["font-size"] / 2.0);
+                    } else {
+                        omIn.style["font-size"].value = Math.round(omIn.style["font-size"].value / 2.0);
+                    }
+                }
             }
             if (bnds) {
                 omgUtils.shiftBoundsX(bnds, ctx._shiftContentX);
