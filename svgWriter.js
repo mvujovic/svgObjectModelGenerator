@@ -272,6 +272,9 @@
                 }
                 
                 if (omIn.position) {
+                    var x = util.round1k(omIn.position.x);
+                    writeAttrIfNecessary(ctx, "x", x, "", "");
+
                     if (!ctx._nextTspanAdjustSuper) {
                         var fontSize = omIn.style["font-size"];
 
@@ -286,32 +289,32 @@
                         }
                     }
                     
-                    if (!omIn.style ||
-                        (omIn.style["text-anchor"] !== "middle" &&
-                         omIn.style["text-anchor"] !== "end") &&
-                        isFinite(omIn.position.x)) {
+                    // if (!omIn.style ||
+                    //     (omIn.style["text-anchor"] !== "middle" &&
+                    //      omIn.style["text-anchor"] !== "end") &&
+                    //     isFinite(omIn.position.x)) {
                         
-                        if (sibling) {
-                            writePositionIfNecessary(ctx, {
-                                x: omIn.position.x,
-                                unitX: omIn.position.unitX
-                            }, "");
-                        }
-                    } else if (omIn.style["text-anchor"] === "middle") {
-                        writePositionIfNecessary(ctx, {
-                            x: omIn.position.x,
-                            unitX: omIn.position.unitX
-                        });
-                        if (isFinite(omIn.position.deltaX)) {
-                            writeAttrIfNecessary(ctx, "dx", omIn.position.deltaX, "0", "px");
-                        }
-                    } else if (omIn.style["text-anchor"] === "end") {
-                        writeAttrIfNecessary(ctx, "x", "100%", "0%", "");
-                        writeAttrIfNecessary(ctx, "startOffset", "100%", "0%", "");
-                        if (isFinite(omIn.position.deltaX)) {
-                            writeAttrIfNecessary(ctx, "dx", omIn.position.deltaX, "0", "px");
-                        }
-                    }
+                    //     if (sibling) {
+                    //         writePositionIfNecessary(ctx, {
+                    //             x: omIn.position.x,
+                    //             unitX: omIn.position.unitX
+                    //         }, "");
+                    //     }
+                    // } else if (omIn.style["text-anchor"] === "middle") {
+                    //     writePositionIfNecessary(ctx, {
+                    //         x: omIn.position.x,
+                    //         unitX: omIn.position.unitX
+                    //     });
+                    //     if (isFinite(omIn.position.deltaX)) {
+                    //         writeAttrIfNecessary(ctx, "dx", omIn.position.deltaX, "0", "px");
+                    //     }
+                    // } else if (omIn.style["text-anchor"] === "end") {
+                    //     writeAttrIfNecessary(ctx, "x", "100%", "0%", "");
+                    //     writeAttrIfNecessary(ctx, "startOffset", "100%", "0%", "");
+                    //     if (isFinite(omIn.position.deltaX)) {
+                    //         writeAttrIfNecessary(ctx, "dx", omIn.position.deltaX, "0", "px");
+                    //     }
+                    // }
                 }
                 
                 ctx._nextTspanAdjustSuper = false;

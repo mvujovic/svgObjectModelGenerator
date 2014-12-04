@@ -291,9 +291,6 @@
             if (textStyle.textStyle.size) {
                 span.style["font-size"] = textStyle.textStyle.size; // Need to take units into account.
             }
-            if (textStyle.textStyle.leading) {
-                span.style["_leading"] = textStyle.textStyle.leading;
-            }
 
             if (textStyle.textStyle.fontStyleName) {
                 if (textStyle.textStyle.fontStyleName.indexOf("Bold") >= 0) {
