@@ -208,7 +208,7 @@
                     currentLine = {
                         from: i,
                         to: i,
-                        dy: y - previousY
+                        y: y
                     };
                     lines.push(currentLine);
 
@@ -290,45 +290,49 @@
             writer.pushCurrent(svgNode);
 
             lines.forEach(function(line, lineIndex) {
-                var svgLineNode,
-                    segments = line.segments,
+                var segments = line.segments,
                     lineId = svgNode.id + "-" + lineIndex,
-                    lineHasMultipleSegments = (segments.length > 1);
-
-                if (lineHasMultipleSegments) {
                     svgLineNode = writer.addSVGNode(lineId, "tspan", true);
+
+                // Line with one segment.
+                if (segments.length == 1) {
+                    var segment = segments[0];
+
+                    svgLineNode.text = segment.textContent;
                     svgLineNode.position = {
-                        x:  -bounds.left,
-                        y: _boundInPx(line.dy, dpi) - bounds.top,
+                        x: segment.x - bounds.left,
+                        y: line.y - bounds.top,
                         unitX: "px",
                         unitY: "px"
                     };
-                    writer.pushCurrent(svgLineNode);
+
+                    omgStyles.addParagraphStyle(svgLineNode, segment.paragraphStyle);
+                    omgStyles.addTextChunkStyle(svgLineNode, segment.span);
+                    return;
                 }
 
-                segments.forEach(function(segment, segmentIndex) {
-                    var segmentId = lineId;
-                    if (lineHasMultipleSegments) {
-                        segmentId += "-" + segmentIndex;
-                    }
+                // Line with multiple segments.
+                svgLineNode.position = {
+                    y: line.y - bounds.top,
+                    unitY: "px"
+                };
+                writer.pushCurrent(svgLineNode);
 
+                segments.forEach(function(segment, segmentIndex) {
+                    var segmentId = lineId + "-" + segmentIndex;
                     var svgSegmentNode = writer.addSVGNode(segmentId, "tspan", true);
                     svgSegmentNode.text = segment.textContent;
                     svgSegmentNode.position = {
-                        x: _boundInPx(segment.x, dpi) - bounds.left,
-                        y: (lineHasMultipleSegments ? 0 : _boundInPx(line.dy, dpi)) - bounds.top,
+                        x: segment.x - bounds.left,
                         unitX: "px",
-                        unitY: "px"
                     };
 
                     omgStyles.addParagraphStyle(svgSegmentNode, segment.paragraphStyle);
                     omgStyles.addTextChunkStyle(svgSegmentNode, segment.span);
                 });
 
-                if (lineHasMultipleSegments) {
-                    // Pop svgLineNode.
-                    writer.popCurrent();
-                }
+                // Pop svgLineNode.
+                writer.popCurrent();
             });
 
             omgStyles.addTextStyle(svgNode, layer);

@@ -267,26 +267,19 @@
                 write(ctx, "<tspan");
                 // Set paragraph styles.
                 
-                if (ctx._nextTspanAdjustSuper) {
-                    writeAttrIfNecessary(ctx, "dy", "0.6em", "0em", "");
-                }
+                // if (ctx._nextTspanAdjustSuper) {
+                //     writeAttrIfNecessary(ctx, "dy", "0.6em", "0em", "");
+                // }
                 
                 if (omIn.position) {
-                    var x = util.round1k(omIn.position.x);
-                    writeAttrIfNecessary(ctx, "x", x, "", "");
+                    if (omIn.position.x != null) {
+                        var x = util.round1k(omIn.position.x);
+                        writeAttrIfNecessary(ctx, "x", x, "", "");
+                    }
 
-                    if (!ctx._nextTspanAdjustSuper) {
-                        var fontSize = omIn.style["font-size"];
-
-                        if (omIn.position.unitY === "em") {
-                            writeAttrIfNecessary(ctx, "dy", omIn.position.y + "em", "0em", "");
-                        } else if (fontSize && fontSize.value > 0) {
-                            var em = util.round1k(omIn.position.y / fontSize.value);
-                            writeAttrIfNecessary(ctx, "dy", em + "em", "0em", "");
-                        } else {
-                            var px = util.round1k(omIn.position.y);
-                            writeAttrIfNecessary(ctx, "dy", px, "0", "");
-                        }
+                    if (omIn.position.y != null) {
+                        var y = util.round1k(omIn.position.y);
+                        writeAttrIfNecessary(ctx, "y", y, "", "");
                     }
                     
                     // if (!omIn.style ||
@@ -317,7 +310,7 @@
                     // }
                 }
                 
-                ctx._nextTspanAdjustSuper = false;
+                // ctx._nextTspanAdjustSuper = false;
                 
                 writeClassIfNeccessary(ctx);
                 write(ctx, ">");
@@ -334,9 +327,9 @@
                 }
                 write(ctx, "</tspan>");
                 
-                if (omIn.style && omIn.style["_baseline-script"] === "super") {
-                    ctx._nextTspanAdjustSuper = true;
-                }
+                // if (omIn.style && omIn.style["_baseline-script"] === "super") {
+                //     ctx._nextTspanAdjustSuper = true;
+                // }
                 
                 break;
             }
