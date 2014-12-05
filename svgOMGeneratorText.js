@@ -262,8 +262,8 @@
                     line.segments.push({
                         from: from,
                         to: to,
+                        // Strip out newlines.
                         textContent: textString.substring(from, to).replace("\r",""),
-                        // TODO(mvujovic): Change this to local coordinates.
                         x: glyphs[from].transform.tx,
                         paragraphStyle: paragraph.paragraphStyle,
                         span: span
@@ -280,6 +280,20 @@
                     if (from == line.to) {
                         break;
                     }
+                }
+
+                // Add a hyphen to the last segment of the line if necessary.
+                // Look at the raw text content, without the newlines removed.
+                var lastSegment = line.segments[line.segments.length - 1];
+
+                var rawTextContent = textString.substring(lastSegment.from, lastSegment.to);
+                var endsWithNonWhitespace = /[^\s]$/.test(rawTextContent);
+
+                var followingTextContent = textString.substring(lastSegment.to);
+                var nextLineStartsWithNonWhitespace = /^[^\s]/.test(followingTextContent);
+
+                if (endsWithNonWhitespace && nextLineStartsWithNonWhitespace) {
+                    lastSegment.textContent += "-";
                 }
             });
         };
