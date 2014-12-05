@@ -300,7 +300,7 @@
 
         this._writeSVGOMWithLines = function(lines, svgNode, layer, text, writer, position, bounds, dpi) {
             var offset = {
-                x: -_boundInPx(text.bounds.left, dpi),
+                x: -_boundInPx(text.boundingBox.left, dpi),
                 y: -_boundInPx(text.boundingBox.top, dpi)
             };
 
