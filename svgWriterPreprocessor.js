@@ -234,13 +234,19 @@
                 }
                 
             } else if (omIn.type === "tspan") {
-                if (omIn.style["_baseline-script"] === "sub" ||
-                    omIn.style["_baseline-script"] === "super") {
+                if ((omIn.style["_baseline-script"] === "sub" ||
+                     omIn.style["_baseline-script"] === "super") &&
+                     !omIn.style["font-size"]["_adjusted-for-baseline-script"]) {
+
                     if (typeof omIn.style["font-size"] === "number") {
                         omIn.style["font-size"] = Math.round(omIn.style["font-size"] / 2.0);
                     } else {
                         omIn.style["font-size"].value = Math.round(omIn.style["font-size"].value / 2.0);
                     }
+
+                    // The font-size style object may be shared by multiple nodes, but we only want
+                    // to change then font-size once.
+                    omIn.style["font-size"]["_adjusted-for-baseline-script"] = true;
                 }
             }
             if (bnds) {
