@@ -238,10 +238,11 @@
                      omIn.style["_baseline-script"] === "super") &&
                      !omIn.style["font-size"]["_adjusted-for-baseline-script"]) {
 
+                    var scriptScaleFactor = 0.55;
                     if (typeof omIn.style["font-size"] === "number") {
-                        omIn.style["font-size"] = Math.round(omIn.style["font-size"] / 2.0);
+                        omIn.style["font-size"] = Math.round(omIn.style["font-size"] * scriptScaleFactor);
                     } else {
-                        omIn.style["font-size"].value = Math.round(omIn.style["font-size"].value / 2.0);
+                        omIn.style["font-size"].value = Math.round(omIn.style["font-size"].value * scriptScaleFactor);
                     }
 
                     // The font-size style object may be shared by multiple nodes, but we only want
